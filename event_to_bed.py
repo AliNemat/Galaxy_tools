@@ -15,9 +15,12 @@ class Bed_File_Row:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', dest='event_file', required=True, help='Name of the .event file which is output of Chexmix')
+    parser.add_argument('--input' , dest='event_file', required=True, help='Name of the .event file which is output of Chexmix')
+    parser.add_argument('--fillter', dest='fillter', type = int, required=True, help='Use this level to filter subtypes with low events')
+    parser.add_argument('--divide', dest='divide', required=True, help='Should event file divided to bed files based on subtypes')
+    parser.add_argument('--strand', dest='strand', required=True, help='Should strand information included in the bed files')
     args = parser.parse_args()
-
+    #time.sleep(60)
     print (" Conversion started ..." )
     parsed_event_file = Parse_Event_File(args.event_file)
     print (" event file parsed" )
@@ -25,9 +28,10 @@ def main():
     print ("bed file data extracted" )
     bed_files         = Split_Bed_File(bed_file)
     print ("bed file splitted" )
-    Write_Bed_Files(bed_files)
+    Write_Bed_Files(bed_files,args)
     print ("bed/gff file written in the output file" )
     #Write_Gff_Files(bed_files)
+
 def Parse_Event_File(file_name):
     with open(file_name) as data:                                                                                          
         data_reader = csv.reader(data, delimiter='\t')
@@ -63,22 +67,26 @@ def Split_Bed_File (bed_file):
     return (bed_files)
 
 
-def Write_Bed_Files(bed_files):
+def Write_Bed_Files(bed_files,args):
+
     file_name = 'subtype' + '0' + '.bed'
     fileM = open(file_name,'w')
     for i in range (len(bed_files)):
-        if (len (bed_files[i]) > 0 ):
-            #file_name = 'subtype' + str(i) + '.bed'
-            #fileM = open(file_name,'w')
-            #fileM.write ('Chrom, Start, End, Name, Score, Strand \n')
+        if (len (bed_files[i]) > args.fillter ):
+            if str_to_bool(args.divide):
+                file_name = 'subtype' + str(i) + '.bed'
+                fileM = open(file_name,'w')
+               #fileM.write ('Chrom, Start, End, Name, Score, Strand \n')
             for bed_file_row in bed_files[i]: 
                 fileM.write(bed_file_row.id_chr + '\t')
                 fileM.write(str(bed_file_row.first_bp)+ '\t')  
                 fileM.write(str(bed_file_row.last_bp)+ '\t')  
                 fileM.write('Subtype' + str (bed_file_row.subtype)+ '\t')  
-                fileM.write(str(bed_file_row.score)+ '\t')  
-                #fileM.write(bed_file_row.strand_dir)  
+                fileM.write(str(bed_file_row.score)+ '\t')
+                if str_to_bool(args.strand):
+                    fileM.write(bed_file_row.strand_dir)
                 fileM.write('\n')
+
 
 def Write_Gff_Files(bed_files):
     file_name = 'subtype' + '0' + '.bed'
@@ -100,6 +108,13 @@ def Write_Gff_Files(bed_files):
                 fileM.write('Subtype' + str (bed_file_row.subtype)+ ';')  
                 fileM.write('\n')
 
+def str_to_bool(s):
+    if s == 'True':
+         return True
+    elif s == 'False':
+         return False
+    else:
+         raise argparse.ArgumentTypeError('Boolean value expected.') 
 
 
 if __name__ == "__main__":

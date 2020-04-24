@@ -3,13 +3,25 @@
     <macros>
         <import>macros.xml</import>
     </macros>
-    <command>
+    <command> 
+        <![CDATA[
         python $__tool_directory__/event_to_bed.py
         --input "$input"
+        --divide $divide
+        --fillter $fillter
+        --strand $strand
+]]>
     </command>
     <inputs>
         <param name="input" type="data" label="events format input" />
+                            <param name="fillter" type="integer" min="0" value="10" label="filter subtypes with less than this number" help="Subtypes with very few events won't lead to any significant motifs in downstream analysis" argument="--fillter"/>
+
+                            <param name="divide" type="boolean" truevalue="True" falsevalue="False" checked="false" label="divide subtypes to different bed files?" argument="--divide" help="Flag to check if you would like to divide file based on subtypes."/>
+
+                            <param name="strand" type="boolean" truevalue="True" falsevalue="False" checked="false" label="include strand information in the bed file?" argument="--strand" help="Flag to check if you would like strand information in the bed files."/>
+
     </inputs>
+
     <outputs>
         <collection name="output_bed" type="list" label=" ${tool.name} (bed) on ${on_string} ">
             <discover_datasets pattern="(?P&lt;designation&gt;.+)\.bed" directory="."  format= "bed" visible="false"  /> 

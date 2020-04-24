@@ -10,15 +10,14 @@
     </requirements>
     <command detect_errors="aggressive">
         <![CDATA[
-
             #set output_dir = $output_html.files_path
             mkdir -p $output_dir &&
-            ## chexmix -Xmx20G
-            java -jar $__tool_directory__/chexmix.jar
+            ## chexmix_v0.45 -Xmx10G
+            java -Xmx20G -jar $__tool_directory__/chexmix.jar
 
             ## General options
             --design '$build_design_file'
-            --threads \${GALAXY_SLOTS:-4}
+            --threads 4
             --geninfo '$chromInfo'
             --back '$back'
 
@@ -162,8 +161,10 @@
             #end if
             && mv $output_dir/*.html '$output_html'
             && mv $output_dir/*.all.events.table '$all_events_table'
+            && mv $output_dir/*.events '$events_file'
             && mv $output_dir/*.counts '$replicates_counts'
-	        && mv $output_dir/*.bed '$output_bed'
+            && mv $output_dir/*.bed  '$output_dir/../working/'
+	    ## $output_dir/*.bed '$output_bed'
 
         ]]>
     </command>
@@ -397,12 +398,13 @@ ${control_items.control}	Control	${control_items.control.ext.upper()}	${conditio
         </data>
 
         <collection name="output_bed" type="list" label=" ${tool.name} (bed) on ${on_string} ">
-            <discover_datasets format= "bed" directory="output" ext="bed"  />
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.bed" directory="."  format= 'bed' visible="false"  /> 
         </collection>
         <!-- <data name="output_bed" format="bed" label="${tool.name} (bed) on ${on_string}"/> -->
         <data name="output_html" format="html" label="${tool.name} (html) on ${on_string}"/>
         <data name="replicates_counts" format="tabular" label="${tool.name} (replicates counts) on ${on_string}"/>
         <data name="all_events_table" format="tabular" label="${tool.name} (all events table) on ${on_string}"/>
+        <data name="events_file" format="tabular" label="${tool.name} (events file) on ${on_string}"/>
     </outputs>
     <tests>
         <test>
