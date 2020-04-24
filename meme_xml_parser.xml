@@ -1,0 +1,42 @@
+<tool id="MEMEXMLParser" name="Check for motif existence in MEME xml file" version="1.0.0">
+    <description></description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <command>
+	<![CDATA[
+	#set output_dir = $output_bed.files_path
+        mkdir -p $output_dir &&
+        python $__tool_directory__/meme_xml_parser.py
+        --input_bed_file "$input_bed"
+        --input_xml_file "$input_xml"
+        --output_bed_path '$output_bed.files_path'
+	--output_xml_path '$output_bed.files_path'
+         && mv $output_dir/*.xml '$output_xml' 
+	 && mv $output_dir/*.bed '$output_bed'  
+
+]]>
+    </command>
+    <inputs>
+        <param name="input_bed" type="data" format ="bed" label="bed format input" />
+        <param name="input_xml" type="data" format ="xml" label="xml format input" />
+    </inputs>
+
+    <outputs>
+        <data name="output_bed" format="bed" label="${tool.name} (bed file) on ${on_string}"/>
+        <data name="output_xml" format="xml" label="${tool.name} (xml file) on ${on_string}"/>
+
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+**What it does**
+
+This tool takes as input, the output file of ChExMix which is in .events format.
+It then generate a list of bed files. Each bed file corresponds to one subtype assessed by ChExMix.
+The number of bed files in the list is equal to the number of subtypes assessed by ChExMix.
+
+    </help>
+    <expand macro="citations_two" />
+</tool>
+

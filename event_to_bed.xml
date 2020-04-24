@@ -1,0 +1,30 @@
+<tool id="EventsToBeds" name="ChExMix events to bed file convertor" version="1.0.0">
+    <description></description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <command>
+        python $__tool_directory__/event_to_bed.py
+        --input "$input"
+    </command>
+    <inputs>
+        <param name="input" type="data" label="events format input" />
+    </inputs>
+    <outputs>
+        <collection name="output_bed" type="list" label=" ${tool.name} (bed) on ${on_string} ">
+            <discover_datasets pattern="(?P&lt;designation&gt;.+)\.bed" directory="."  format= "bed" visible="false"  /> 
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+**What it does**
+
+This tool takes as input, the output file of ChExMix which is in .events format.
+It then generate a list of bed files. Each bed file corresponds to one subtype assessed by ChExMix.
+The number of bed files in the list is equal to the number of subtypes assessed by ChExMix. 
+
+    </help>
+    <expand macro="citations_two" />
+</tool>
+
