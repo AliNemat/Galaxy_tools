@@ -1,0 +1,56 @@
+<tool id="script_manager" name="script_manager" version="0.1.0">
+    <description>generates heatsmaps, fourcolor plot and tagpileup</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <requirements>
+	<requirement type="package" version="8.0.112">openjdk</requirement>
+    </requirements>
+
+
+    <command detect_errors="aggressive">
+        <![CDATA[
+        
+        #set output_dir = $output_out.files_path
+        mkdir -p $output_dir
+        && cp $input_bed 'tmp.bed'
+        && cp $input_bam 'tmp2.bam'
+        && samtools index tmp2.bam $output_dir/../working/tmp2.bam.bai
+        && python $__tool_directory__/sleep.py
+        && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar  read-analysis tag-pileup 
+        'tmp.bed'
+        'tmp2.bam'
+        -M pileup 
+        -o 'composite_data.out'
+        && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar  figure-generation composite-plot 
+        'composite_data.out' 
+        -o 'composite_24466_motif1.png'
+        && mv $output_dir/../working/*.png '$output_out'
+        ]]>
+    </command>
+    <inputs>
+
+        <param name="input_bed" type="data" format="bed"  label="input bed file" />
+        <param name="input_bam" type="data" format ="bam" label="input bam file" />
+</inputs>
+
+    <outputs>
+        <data name="output_out" format="png" label="${tool.name} (out file) on ${on_string}" />
+
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+**What it does**
+
+
+
+
+    </help>
+    <expand macro="citations_two" />
+</tool>
+
+
+
+
+
