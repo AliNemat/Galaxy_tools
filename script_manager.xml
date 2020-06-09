@@ -10,32 +10,99 @@
 
     <command detect_errors="aggressive">
         <![CDATA[
-        
-        #set output_dir = $output_out.files_path
+                
+        #if str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_active' or str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_and_heatmap_active' :
+            #set output_dir = $output_tag_pileup.files_path
+        #end if
+        #if str($tag_pileup_and_heatmap_options.options_type_selector) == 'heatmap_active'        
+            #set output_dir = $output_heatmap.files_path
+        #end if 
+        #if str($four_color.four_color_active) == 'yes':
+            #set output_dir = $output_four_color.files_path
+        #end if 
         mkdir -p $output_dir
-        && cp $input_bed 'tmp.bed'
-        && cp $input_bam 'tmp2.bam'
-        && samtools index tmp2.bam $output_dir/../working/tmp2.bam.bai
-        && python $__tool_directory__/sleep.py
-        && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar  read-analysis tag-pileup 
-        'tmp.bed'
-        'tmp2.bam'
-        -M pileup 
-        -o 'composite_data.out'
-        && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar  figure-generation composite-plot 
-        'composite_data.out' 
-        -o 'composite_24466_motif1.png'
-        && mv $output_dir/../working/*.png '$output_out'
+        #if str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_active' or str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_and_heatmap_active' or str($tag_pileup_and_heatmap_options.options_type_selector) == 'heatmap_active' :
+            && cp $input_bed 'tmp.bed'
+            && cp $input_bam 'tmp2.bam'
+            && samtools index tmp2.bam $output_dir/../working/tmp2.bam.bai
+            && python $__tool_directory__/sleep.py
+            && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar  read-analysis tag-pileup 
+            'tmp.bed'
+            'tmp2.bam'
+            -M pileup 
+            -o 'composite_data.out'
+        #end if 
+        #if str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_active' or str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_and_heatmap_active' :
+            && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar  figure-generation composite-plot 
+            'composite_data.out' 
+            -o 'composite.png'
+            && mv $output_dir/../working/composite.png '$output_tag_pileup'
+        #end if
+        #if str($tag_pileup_and_heatmap_options.options_type_selector) == 'heatmap_active' or str($tag_pileup_and_heatmap_options.options_type_selector) == 'tag_pileup_and_heatmap_active' :
+            && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar figure-generation heatmap 'pileup_sense.cdt' -o 'sense.png'
+            && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar figure-generation heatmap 'pileup_anti.cdt' -o  'anti.png'
+            && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar figure-generation merge-heatmap 'sense.png' 'anti.png' -o 'merge.png'
+            && mv $output_dir/../working/merge.png '$output_heatmap'
+        #end if
+        #if str($four_color.four_color_active) == 'yes':
+            && cp $input_fasta 'tmp3.fasta'
+            && java -jar $__tool_directory__/ScriptManager_owlangFork-0.121-dev.jar figure-generation four-color tmp3.fasta -o four_color.png
+            && mv $output_dir/../working/four_color.png '$output_four_color'
+        #end if
         ]]>
     </command>
     <inputs>
+        <conditional name="tag_pileup_and_heatmap_options">
+            
+            <param name="options_type_selector" type="select" label="Options for plotting heatmap and tag pileup">
+                <option value="tag_pileup_active">tag_pileup</option>
+                <option value="heatmap_active" >heatmap</option>
+                <option value="tag_pileup_and_heatmap_active">tag_pileup_and_heatmap</option>
+                <option value="no_tag_pileup_or_heatmap_active" selected="true">no_tag_pileup_or_heatmap</option>
+            </param>
 
-        <param name="input_bed" type="data" format="bed"  label="input bed file" />
-        <param name="input_bam" type="data" format ="bam" label="input bam file" />
+            
+            <when value="tag_pileup_active">
+                <param name="input_bed" type="data" format="bed"      label="input bed file" />
+                <param name="input_bam" type="data" format ="bam"     label="input bam file" />
+            </when>
+            <when value="heatmap_active">
+                <param name="input_bed" type="data" format="bed"      label="input bed file" />
+                <param name="input_bam" type="data" format ="bam"     label="input bam file" />
+            </when>
+            <when value="tag_pileup_and_heatmap_active">
+                <param name="input_bed" type="data" format="bed"      label="input bed file" />
+                <param name="input_bam" type="data" format ="bam"     label="input bam file" />
+            </when>
+            <when value="no_tag_pileup_or_heatmap_active">
+                <!-- do nothing here -->
+            </when>
+
+        </conditional>
+
+        <conditional name="four_color">
+            <param name="four_color_active" type="select" display="radio" label="plot four color?">
+                <option value="no" selected="true">No</option>
+                <option value="yes">Yes</option>
+            </param>
+            <when value="yes">
+                <param name="input_fasta" type="data" format ="fasta" label="input fasta file" />
+            </when>
+        </conditional>
 </inputs>
 
     <outputs>
-        <data name="output_out" format="png" label="${tool.name} (out file) on ${on_string}" />
+        <data name="output_tag_pileup" format="png" label="${tool.name} (out file) on ${on_string}">
+        
+            <filter>tag_pileup_and_heatmap_options['options_type_selector'] == 'tag_pileup_active' or tag_pileup_and_heatmap_options['options_type_selector'] == 'tag_pileup_and_heatmap_active' </filter>
+        </data>
+        <data name="output_heatmap" format="png" label="${tool.name} (out file) on ${on_string}">
+        
+            <filter>tag_pileup_and_heatmap_options['options_type_selector'] == 'heatmap_active' or tag_pileup_and_heatmap_options['options_type_selector'] == 'tag_pileup_and_heatmap_active' </filter>
+        </data>
+        <data name="output_four_color" format="png" label="${tool.name} (out file) on ${on_string}" >
+            <filter>four_color['four_color_active'] == 'yes'</filter>
+        </data>
 
     </outputs>
     <tests>
