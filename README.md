@@ -11,8 +11,8 @@ Currently it includes the following tools:
 
 4-An XML Galaxy tool for script_manager to plot tag-pileup, heatmap and four-color plot. This tools is combined simplified version of script-mamnger.
 
-5-An XML Galaxy tool for script_manager to plot tag-pileup with options available for smoothing, shifting and changing figure properties
+5-An XML Galaxy tool for script_manager to plot tag-pileup with options available for smoothing, shifting and changing figure properties.
 
-6-An XML Galaxy tool for script_manager to plot four-color graph with options available for size and color of pixels
+6-An XML Galaxy tool for script_manager to plot four-color graph with options available for size and color of pixels.
 
-7-An XML Galaxy tool for script_manager to plot heatmap
+7-An XML Galaxy tool for script_manager to plot heatmap with options available for smoothing, shifting and changing figure properties.
