@@ -1,4 +1,4 @@
-<tool id="script_manager_4color" name="script_manager_4color" version="0.1.0">
+<tool id="script_manager_4color" name="script-manager four-color plot" version="0.1.0">
     <description>generates four-color plot</description>
     <macros>
         <import>macros.xml</import>
